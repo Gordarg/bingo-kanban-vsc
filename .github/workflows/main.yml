@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - name: npm install, build, and test
+      run: |
+        npm ci
+        npm run compile
+        npm test
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+        registry-url: https://marketplace.visualstudio.com
+    - name: Install vsce
+      run: npm install -g vsce
+    - name: Export locally
+      run: vsce package
+    - name: Publish to Marketplace
+      run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
