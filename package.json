@@ -1,0 +1,67 @@
+{
+    "name": "bingo-kanban",
+    "displayName": "Bingo Kanban",
+    "publisher": "Gordarg",
+    "description": "",
+    "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Gordarg/bingo-kanban-vsc.git"
+    },
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [],
+    "main": "./extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "bingo-kanban.helloWorld",
+                "title": "Show Toast"
+            },
+            {
+                "id": "bingo-kanban.board",
+                "command": "bingo-kanban.board",
+                "title": "View Board",
+                "icon": {
+                    "light": "path-to-light-theme-icon",
+                    "dark": "path-to-dark-theme-icon"
+                }
+            }
+        ],
+        "views": {
+            "explorer": [
+                {
+                    "id": "bingo-kanban.board",
+                    "name": "Kanban Board"
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "bingo-kanban.board",
+                    "when": "view == bingo-kanban.board",
+                    "group": "navigation"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "pretest": "npm run lint",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.85.0",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "18.x",
+        "eslint": "^8.56.0",
+        "typescript": "^5.3.3",
+        "@vscode/test-cli": "^0.0.4",
+        "@vscode/test-electron": "^2.3.8"
+    }
+}
