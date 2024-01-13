@@ -1,4 +1,3 @@
-// wip: refactor the code
 // Import required modules
 const vscode = require('vscode');
 const fs = require('fs');
