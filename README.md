@@ -14,9 +14,11 @@ Bingo Kanban is a Visual Studio Code extension that helps developers manage thei
 ## Installation
 
 ### From Marketplace
+1. Launch VS Code Quick Open (Ctrl+P), paste the following command, and press enter.
+2. `ext install Gordarg.bingo-kanban`
 
 ### From source
-1. Clone this repository: `git clone https://github.com/<username>/bingo-kanban.git`
+1. Clone this repository: `git clone https://github.com/Gordarg/bingo-kanban-vsc.git`
 2. Open the cloned repository in Visual Studio Code.
 3. Press `F5` to run the extension in a new Extension Development Host window.
 
