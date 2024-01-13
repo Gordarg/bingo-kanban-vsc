@@ -1,7 +1,9 @@
-
 # Bingo Kanban
 
 Bingo Kanban is a Visual Studio Code extension that helps developers manage their tasks directly in their codebase. It converts code comments into Kanban cards, providing a visual overview of the tasks and their progress.
+
+## Demo
+![Visual Studio Code Kanban](demo.gif)
 
 ## Features
 
