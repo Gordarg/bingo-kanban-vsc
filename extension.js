@@ -1,8 +1,16 @@
+// todo: refactor the code
+
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+const { execSync } = require('child_process');
+
+
+const filePath = path.join(vscode.workspace.rootPath, 'kanban.json');
+
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -11,6 +19,24 @@ const path = require('path');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+
+
+
+	const fileWatcher = vscode.workspace.createFileSystemWatcher(filePath);
+
+	fileWatcher.onDidChange(e => {
+		// The kanban.json file has changed, refresh the Kanban board
+		getWebviewContent();
+	});
+
+	context.subscriptions.push(fileWatcher);
+
+
+
+
+
+
+
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
@@ -41,12 +67,8 @@ function activate(context) {
 			}
 		);
 
-		let kanbanData = {};
-		const filePath = path.join(__dirname, 'kanban.json');
-		if (fs.existsSync(filePath)) {
-			const rawData = fs.readFileSync(filePath);
-			kanbanData = JSON.parse(rawData);
-		}
+		ensureKanbanData();
+		const kanbanData = getKanbanData();
 
 		panel.webview.html = getWebviewContent(kanbanData);
 
@@ -67,6 +89,71 @@ function activate(context) {
 
 
 
+
+
+	let disposable3 = vscode.commands.registerCommand('bingo-kanban.findTodosAndWips', function () {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			vscode.window.showErrorMessage('No active editor found');
+			return;
+		}
+
+		const text = editor.document.getText();
+		const lines = text.split('\n');
+
+		let todos = [];
+		let wips = [];
+
+		lines.forEach(line => {
+			const todoIndex = line.indexOf('todo:');
+			if (todoIndex !== -1) {
+				const todo = line.slice(todoIndex + 'todo:'.length).trim();
+				todos.push(todo);
+			}
+
+			const wipIndex = line.indexOf('wip:');
+			if (wipIndex !== -1) {
+				const wip = line.slice(wipIndex + 'wip:'.length).trim();
+				wips.push(wip);
+			}
+		});
+
+
+		ensureKanbanData();
+		const kanbanData = getKanbanData();
+
+		const fileStats = fs.statSync(editor.document.fileName);
+		const modifiedDate = fileStats.mtime;
+
+		let username;
+		try {
+			username = execSync('git config user.name', { encoding: 'utf8' }).trim();
+		} catch (error) {
+			username = os.userInfo().username;
+		}
+
+		todos = todos.map(todo => ({ task: todo, modifiedDate: modifiedDate, username: username }));
+		wips = wips.map(wip => ({ task: wip, modifiedDate: modifiedDate, username: username }));
+
+		kanbanData['To Do'] = [...new Set([...kanbanData['To Do'] || [], ...todos])];
+		kanbanData['In Progress'] = [...new Set([...kanbanData['In Progress'] || [], ...wips])];
+
+		fs.writeFileSync(filePath, JSON.stringify(kanbanData, null, 2));
+	});
+
+	context.subscriptions.push(disposable3);
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 // This method is called when your extension is deactivated
@@ -80,7 +167,6 @@ module.exports = {
 
 
 function getKanbanData() {
-	const filePath = path.join(__dirname, 'kanban.json');
 	if (fs.existsSync(filePath)) {
 		const rawData = fs.readFileSync(filePath);
 		const kanbanData = JSON.parse(rawData);
@@ -92,7 +178,6 @@ function getKanbanData() {
 }
 
 function ensureKanbanData() {
-	const filePath = path.join(__dirname, 'kanban.json');
 	if (!fs.existsSync(filePath)) {
 		const sampleData = {
 			"To Do": ["Task 1", "Task 2"],
@@ -114,9 +199,13 @@ function getWebviewContent() {
 	let kanbanHtml = '';
 	for (let column in kanbanData) {
 		let columnHtml = `<div class="column"><h2>${column}</h2>`;
-		for (let card of kanbanData[column]) {
-			columnHtml += `<div class="card">${card}</div>`;
-		}
+        for (let card of kanbanData[column]) {
+            columnHtml += `<div class="card">
+                <h4>${card.task}</h4>
+                <time>${new Date(card.modifiedDate).toLocaleDateString()}</time>
+                <span>${card.username}</span>
+            </div>`;
+        }
 		columnHtml += '</div>';
 		kanbanHtml += columnHtml;
 	}
@@ -129,23 +218,23 @@ function getWebviewContent() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Kanban Board</title>
         <style>
-  .kanban-board {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-    }
-    .column {
-        flex: 1;
-        border: 1px solid #ccc;
-        padding: 10px;
-        border-radius: 5px;
-    }
-    .card {
-        background-color: #eee;
-        margin-bottom: 10px;
-        padding: 5px;
-        border-radius: 3px;
-    }
+			.kanban-board {
+				display: flex;
+				justify-content: space-between;
+				gap: 20px;
+			}
+			.column {
+				flex: 1;
+				border: 1px solid #ccc;
+				padding: 10px;
+				border-radius: 5px;
+			}
+			.card {
+				background-color: #eee;
+				margin-bottom: 10px;
+				padding: 5px;
+				border-radius: 3px;
+			}
         </style>
         <script>
         // Add your JavaScript code here to handle interactivity

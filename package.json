@@ -30,6 +30,10 @@
                     "light": "path-to-light-theme-icon",
                     "dark": "path-to-dark-theme-icon"
                 }
+            },
+            {
+                "command": "bingo-kanban.findTodosAndWips",
+                "title": "Add to Kanban"
             }
         ],
         "views": {
