@@ -19,12 +19,8 @@
     "contributes": {
         "commands": [
             {
-                "command": "bingo-kanban.helloWorld",
-                "title": "Show Toast"
-            },
-            {
-                "id": "bingo-kanban.board",
-                "command": "bingo-kanban.board",
+                "id": "bingo-kanban.view",
+                "command": "bingo-kanban.view",
                 "title": "View Board",
                 "icon": {
                     "light": "path-to-light-theme-icon",
@@ -32,14 +28,14 @@
                 }
             },
             {
-                "command": "bingo-kanban.findTodosAndWips",
+                "command": "bingo-kanban.add",
                 "title": "Add to Kanban"
             }
         ],
         "views": {
             "explorer": [
                 {
-                    "id": "bingo-kanban.board",
+                    "id": "bingo-kanban.view",
                     "name": "Kanban Board"
                 }
             ]
@@ -47,8 +43,8 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "bingo-kanban.board",
-                    "when": "view == bingo-kanban.board",
+                    "command": "bingo-kanban.view",
+                    "when": "view == bingo-kanban.view",
                     "group": "navigation"
                 }
             ]
@@ -60,12 +56,15 @@
         "test": "vscode-test"
     },
     "devDependencies": {
-        "@types/vscode": "^1.85.0",
         "@types/mocha": "^10.0.6",
         "@types/node": "18.x",
-        "eslint": "^8.56.0",
-        "typescript": "^5.3.3",
+        "@types/vscode": "^1.85.0",
         "@vscode/test-cli": "^0.0.4",
-        "@vscode/test-electron": "^2.3.8"
+        "@vscode/test-electron": "^2.3.8",
+        "eslint": "^8.56.0",
+        "typescript": "^5.3.3"
+    },
+    "dependencies": {
+        "uuid": "^9.0.1"
     }
 }
